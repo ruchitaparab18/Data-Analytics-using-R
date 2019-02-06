@@ -1,0 +1,14 @@
+v1<-read.csv("E:\\Fall 2018\\IS 777\\dataGroupC\\cutilization.csv")
+#summary of cutilization table
+summary(v1)
+#Delete all duplicate ID values
+V2<- unique(v1)
+#delete NA values in column ID
+V2update<-V2[!is.na(V2$id),]
+str(V2update)
+a<- c("yes","no")
+V2update<-replace(V2update$admittedhospital,V2update$admittedhospital!=a,"yes")
+levels<-V2update
+V2update[V2update$admittedhospital!= yes|no]<-"Yes"
+V3update<-factor(V2update$admittedhospital)
+levels(V2update$admittedhospital)[!((V2update$admittedhospital)=="yes")&!((V2update$admittedhospital)=="no")]<-"yes"
