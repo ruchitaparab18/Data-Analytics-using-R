@@ -1,0 +1,17 @@
+v1<-read.csv("E:\\Fall 2018\\IS777\\D3\\Merged_Dataset_NO_ID.csv", sep= "\t")
+head(v1)
+v2<-subset(v1, select=c("age","income","mortscore"))
+head(v2)
+#Standardize quantitative variables in merged file
+standardized_data=data.frame(scale(v2))
+head(standardized_data)
+#Mean of standardized columns
+colMeans(standardized_data)
+#Standard Deviation of standardized columns
+apply(standardized_data,2,sd)
+#Replace standardized columns with existing columns in v1
+v1[["age"]]<-standardized_data[["age"]]
+v1[['income']]<-standardized_data[["income"]]
+v1[['mortscore']]<-standardized_data[["mortscore"]]
+head(v1)
+write.csv(v1,file="Standardized_data.csv")
