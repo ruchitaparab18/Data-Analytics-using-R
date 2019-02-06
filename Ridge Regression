@@ -1,0 +1,48 @@
+v1<-read.csv("E:\\Fall 2018\\IS777\\D5\\Merged_Dataset_NO_ID.csv",sep='\t')
+head(v1)
+
+sum(is.na(v1$LOS))
+v1=na.omit(v1)
+library(glmnet)
+library(ISLR)
+library(leaps)
+
+#Fitting ridge regression model
+x=model.matrix(v1$LOS~.,v1)[,-1]
+y=v1$LOS
+grid=10^seq(10,-2,length =100)
+ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
+dim(coef(ridge.mod ))
+#value of coefficients when lambda is large
+ridge.mod$lambda[50]
+coef(ridge.mod)[,50]
+sqrt(sum(coef(ridge.mod)[ -1 ,50]^2))
+#value of coefficients when lambda is small
+ridge.mod$lambda [60]
+coef(ridge.mod)[,60]
+sqrt(sum(coef(ridge.mod)[ -1 ,60]^2))
+#Splitting model into test set and training set, to estimate the test error of ridge regression
+set.seed(1)
+train=sample(1:nrow(x),nrow(x)/2)
+test=(-train)
+y.test=y[test]
+#Fitting regression model on training set and evaluate its MSE on test set
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid,thresh=1e-12)
+ridge.pred=predict(ridge.mod,s=4,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+
+#Fitting regression model on training set and evaluate its MSE on test set, lambda=10^10
+ridge.pred=predict(ridge.mod ,s=1e10 ,newx=x[test,])
+mean(( ridge.pred -y.test)^2)
+#cross-validation to choose the tuning parameter λ.
+set.seed(1)
+cv.out=cv.glmnet(x[train,],y[train],alpha=0)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+bestlam
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+#refit ridge regression on full dataset using lambda value obtained by using cv
+out=glmnet(x,y,alpha=0)
+predict(out,type="coefficients",s=bestlam )[1:33,]
+
